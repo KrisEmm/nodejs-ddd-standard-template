@@ -1,0 +1,6 @@
+services:
+
+  App.Web.Controllers.WelcomeController:
+    class: ../../controllers/WelcomeController
+    arguments: [ '@App.Shared.Logger' ]
+

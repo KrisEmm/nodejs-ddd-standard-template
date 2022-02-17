@@ -1,0 +1,5 @@
+services:
+
+  App.Aggregate.AggregateRepository:
+    class: ../../../../context/shared/infrastructure/persistence/mysql/MySqlAggregateRepository
+    arguments: [ '@App.Shared.EntityManager' ]

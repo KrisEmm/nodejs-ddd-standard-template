@@ -1,0 +1,10 @@
+{
+  "video": false,
+  "screenshotOnRunFailure": false,
+  "testFiles": "**/*.cypress.*",
+  "fixturesFolder": "tests/utils/cypress/fixtures",
+  "integrationFolder": "tests/app",
+  "pluginsFile": "tests/utils/cypress/plugins/index.ts",
+  "supportFile": "tests/utils/cypress/support/index.ts",
+  "experimentalStudio": true
+}

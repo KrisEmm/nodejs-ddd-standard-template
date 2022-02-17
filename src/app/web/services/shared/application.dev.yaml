@@ -1,0 +1,21 @@
+services:
+
+  App.Shared.LoggerConfig:
+    factory:
+      class: ../../../../context/shared/infrastructure/logging/WinstonLoggerDevConfig
+      method: 'config'
+    arguments: [ ]
+
+  App.Shared.Logger:
+    class: ../../../../context/shared/infrastructure/logging/WinstonLogger
+    arguments: [ '@App.Shared.LoggerConfig' ]
+
+  App.Shared.ErrorHandlerMiddleware:
+    class: ../../../../context/shared/infrastructure/express/middlewares/ErrorHandlerMiddleware
+    arguments: [ '@App.Shared.Logger' ]
+
+  App.Shared.EntityManager:
+    factory:
+      class: ../../../../context/shared/infrastructure/persistence/mysql/ContextEntityManagerFactory
+      method: 'create'
+      arguments: [ ]
