@@ -21,6 +21,6 @@ routesPaths.map(routePath => {
   app.use('/', router);
 });
 
-app.use(errorHandlerMiddleware.run.bind(errorHandlerMiddleware));
+app.use(errorHandlerMiddleware.execute.bind(errorHandlerMiddleware));
 
 export const ApplicationRestApp: express.Express = app;
