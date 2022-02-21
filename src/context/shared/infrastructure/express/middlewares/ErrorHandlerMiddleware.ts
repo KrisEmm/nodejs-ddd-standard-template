@@ -1,10 +1,10 @@
 import { NextFunction, Request, Response } from 'express';
 import httpStatus from 'http-status';
-import { CustomError } from 'krisemm/context/shared/domain/errors/CustomError';
+import { DomainException } from 'krisemm/context/shared/domain/exceptions/DomainException';
 import Logger from 'krisemm/context/shared/domain/logging/Logger';
-import { Middleware } from 'krisemm/context/shared/infrastructure/express/middlewares/Middleware';
+import { ErrorMiddleware } from 'krisemm/context/shared/infrastructure/express/middlewares/ErrorMiddleware';
 
-export class ErrorHandlerMiddleware implements Middleware {
+export class ErrorHandlerMiddleware implements ErrorMiddleware {
   private readonly DEFAULT_STATUS_CODE = 500;
   private logger: Logger;
 
@@ -12,26 +12,27 @@ export class ErrorHandlerMiddleware implements Middleware {
     this.logger = logger;
   }
 
-  run(error: Error, req: Request, res: Response, next: NextFunction) {
-    console.log('In ErrorHandlerMiddleware is ', error instanceof CustomError);
-    if (error instanceof CustomError) {
-      const statusCodeMapped = this.getStatusCodeMappedFor(error, req.app.get('error_mapping'));
-      const responseWithError = {
-        error: error.getNameError(),
-        message: error.getMessageError(),
-        status_code: statusCodeMapped
-      };
+  execute(error: Error, req: Request, res: Response, next: NextFunction) {
+    if (!(error instanceof DomainException)) {
       this.logger.error(error);
-      res.status(statusCodeMapped).json(responseWithError);
+      res.status(httpStatus.INTERNAL_SERVER_ERROR).send(httpStatus[httpStatus.INTERNAL_SERVER_ERROR]);
       return;
     }
+
+    const statusCodeMapped = this.getStatusCodeMappedFor(error, req.app.get('exceptionCodeMapping'));
+
+    const responseWithError = {
+      error: error.name,
+      message: error.message
+    };
+
     this.logger.error(error);
-    res.status(httpStatus.INTERNAL_SERVER_ERROR).send(httpStatus[httpStatus.INTERNAL_SERVER_ERROR]);
+
+    res.status(statusCodeMapped).json(responseWithError);
   }
 
   private getStatusCodeMappedFor(error: Error, errors: Map<string, number>): number {
     const statusCodeMapped = errors.get(error.constructor.name);
-    console.log(statusCodeMapped);
-    return statusCodeMapped ? statusCodeMapped : this.DEFAULT_STATUS_CODE;
+    return statusCodeMapped ?? this.DEFAULT_STATUS_CODE;
   }
 }
